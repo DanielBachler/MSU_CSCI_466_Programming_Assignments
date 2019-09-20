@@ -20,8 +20,16 @@ def handlePost(request):
     y = request[6]
     #global gameboard
     # C B R S D
-    #if(gameboard[x][y] == 'C')
-    return "miss"
+    if(gameboard[x][y] == 'C'): 
+        return "test"
+
+def didSink(shipType):
+    for i in range(0,10):
+        for j in range(0,10):
+            if gameboard[i][j] == shipType:
+                return False
+            else:
+                return True
 
 # The base form for server and request handler taken from online examples
 # Found at: (TODO insert)
