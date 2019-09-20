@@ -4,6 +4,9 @@ import socketserver
 
 PORT = 8081
 
+# The base form for server and request handler taken from online examples
+# Found at: (TODO insert)
+
 #Handle override
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     # When contacted by a client, send Hello World
@@ -16,25 +19,24 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
     # Handling POST requests
     def do_POST(self):
-        # ?
+        # Gets the length of the header as an integer
         content_length = int(self.headers['Content-Length'])
-        # ?
+        # Sets body equal to the value of the content in the packet
         body = self.rfile.read(content_length)
-        # Needed
+        # Needed, otherwise invalid request
         self.send_response(200)
         self.end_headers()
-        # Get response
+        # Get response from Bytes.IO lib
         response = BytesIO()
-        # Label
+        # Print out that this is a POST request 
         response.write(b'This is POST request. ')
-        # ?
+        # Writes out what was recieved
         response.write(b'Received: ')
-        # ?
         response.write(body)
         # ?
         self.wfile.write(response.getvalue())
 
 # Init server on ip for localc computer on TCP port open to firewall
-httpd = HTTPServer(('100.64.11.151', 8081), SimpleHTTPRequestHandler)
+httpd = HTTPServer(('127.0.0.1', 8081), SimpleHTTPRequestHandler)
 # Server do server things forever
 httpd.serve_forever()
