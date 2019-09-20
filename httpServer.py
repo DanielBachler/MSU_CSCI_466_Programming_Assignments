@@ -35,6 +35,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(response.getvalue())
 
 # Init server on ip for localc computer on TCP port open to firewall
-httpd = HTTPServer(('192.168.0.138', 8081), SimpleHTTPRequestHandler)
+httpd = HTTPServer(('100.64.11.151', 8081), SimpleHTTPRequestHandler)
 # Server do server things forever
 httpd.serve_forever()
