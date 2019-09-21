@@ -24,8 +24,8 @@ def read(x,y, status):
                 counter += 1
         array[int(x)][int(y)] = status
         #prints the array
-        for i in range(10):
-            print(array[i])
+        #for i in range(10):
+        #    print(array[i])
     write(x,y,status)
 
 #uses the arguments to create the required variables

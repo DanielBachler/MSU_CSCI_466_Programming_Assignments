@@ -1,4 +1,4 @@
-#Dan and Logan, HTTP Server to run Battleship from
+# Dan and Logan, HTTP Server to run Battleship from
 # import needed libraries
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
@@ -143,7 +143,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         # Closes header, needed for proper formatted request
         self.end_headers()
         # Print the board after each request
-        printBoard()
+        # printBoard()
 
 # Init server on ip for given IP on TCP port provided by Sys ARGS.
 # Port must be open on firewall
@@ -151,6 +151,6 @@ httpd = HTTPServer(('192.168.0.197', int(sys.argv[1])), SimpleHTTPRequestHandler
 # Creates the board from the Sys ARG file
 gameboard = makeBoard(sys.argv[2])
 # Prints the inital board
-printBoard()
+# printBoard()
 # Server runs until ctrl+C is pressed in terminal
 httpd.serve_forever()
