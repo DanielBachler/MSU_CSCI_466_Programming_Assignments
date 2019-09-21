@@ -89,18 +89,32 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
         # Prints gameboard to local site
+        self.wfile.write(bytes("Your board\n", "UTF-8"))
         for i in range(0,10):
             for j in range(0,10):
                 self.wfile.write(bytes(gameboard[i][j], "UTF-8"))
             self.wfile.write(b'\n')
+        # Prints opponent board
+        self.wfile.write(bytes("\nOpponent board\n", "UTF-8"))
+        array = [[0 for x in range(10)] for y in range(10)]
+        with open("opponent_board.csv", mode="r") as file:
+            counter = 0
+            #seperates the various levels of lists and and fills the array
+            lines = [line.split() for line in file]
+            for line in lines:
+                if(len(line) > 0):
+                    line = line[0].split(',')
+                    for i in range(10):
+                        array[counter][i] = line[i]
+                    counter += 1
+            #prints the array
+            for i in range(10):
+                for j in range(10):
+                    self.wfile.write(bytes(array[i][j], "UTF-8"))
+                self.wfile.write(b'\n')
 
     # Handling POST requests
     def do_POST(self):
-        # Gets the length of the header as an integer
-        # content_length = int(self.headers['Content-Length'])
-        # Sets body equal to the value of the content in the packet
-        # body = self.rfile.read(content_length)
-
         # Get the value of result from handlePost, and send the correct HTTP message
         result = handlePost(self.path)
 
@@ -130,19 +144,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         # Print the board after each request
         printBoard()
-        # Create BytesIO object
-        # response = BytesIO()
-        # Print out that this is a POST request 
-        # response.write(b'This is POST request. ')
-        # Writes out what was recieved
-        # response.write(b'Received: ')
-        # response.write(body)
-        # ?
-        #self.wfile.write(response.getvalue())
 
 # Init server on ip for given IP on TCP port provided by Sys ARGS.
 # Port must be open on firewall
-httpd = HTTPServer(('192.168.197', int(sys.argv[1])), SimpleHTTPRequestHandler)
+httpd = HTTPServer(('192.168.0.197', int(sys.argv[1])), SimpleHTTPRequestHandler)
 # Creates the board from the Sys ARG file
 gameboard = makeBoard(sys.argv[2])
 # Prints the inital board

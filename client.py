@@ -17,10 +17,11 @@ def read(x,y, status):
         #seperates the various levels of lists and and fills the array
         lines = [line.split() for line in file]
         for line in lines:
-            line = line[0].split(',')
-            for i in range(10):
-                array[counter][i] = line[i]
-            counter += 1
+            if(len(line) > 0):
+                line = line[0].split(',')
+                for i in range(10):
+                    array[counter][i] = line[i]
+                counter += 1
         array[int(x)][int(y)] = status
         #prints the array
         for i in range(10):
