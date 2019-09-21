@@ -3,46 +3,77 @@ from io import BytesIO
 import socketserver
 import sys
 import numpy as np
+import re
 
 # Takes in the gameboard file and returns a 2D array of it
 def makeBoard(fileName):
     boardFile = open(fileName, 'r')
-    gameboard = np.chararray(shape=[10,10])
+    gameboard = [['0' for x in range(10)] for y in range(10)]
     for i in range(0,10):
         line = boardFile.readline()
+        #print(line)
         for j in range(0,10):
             gameboard[i][j] = line[j]
+    boardFile.close()
     return gameboard
+
+def printBoard():
+    for i in range(0,10):
+        print(gameboard[i])
 
 # Takes the POST request and determines if that hits or not
 def handlePost(request):
-    x = request[2]
-    y = request[6]
+    request = re.sub('[yx=]', '', request)
+    request = re.sub('[&]', ' ', request)
+    request = request.split(" ")
+    
+    try:
+        x = int(request[0])
+        y = int(request[1])
+    except:
+        return "bad-req"
     #global gameboard
     # C B R S D
-    if(gameboard[x][y] == 'C'): 
-        return "test"
+    # If out of bounds handle
+    if((x > 9 and x < 0) or (y > 9 or y < 0)):
+        return "oob"
+    # Get value into one var so I dont have to type gameboard[x][y] a thousand times
+    target = gameboard[x][y]
+    # Target handling
+    if(target != '_'): 
+        if(target.islower()):
+            return "hit rep"
+        gameboard[x][y] = target.lower()
+        if(didSink(target)):
+            return "sank " + target
+        else:
+            return "hit"
+    else:
+        return "miss"
 
 def didSink(shipType):
+    shipSunk = True
     for i in range(0,10):
         for j in range(0,10):
             if gameboard[i][j] == shipType:
-                return False
-            else:
-                return True
+                shipSunk = False
+    return shipSunk
 
 # The base form for server and request handler taken from online examples
 # Found at: (TODO insert)
 
 #Handle override
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    # When contacted by a client, send Hello World
+    # When contacted by a client, send gameboard
     def do_GET(self):
         # Needed
         self.send_response(200)
         self.end_headers()
         # Send message
-        self.wfile.write(b'Hello, World')
+        for i in range(0,10):
+            for j in range(0,10):
+                self.wfile.write(bytes(gameboard[i][j], "UTF-8"))
+            self.wfile.write(b'\n')
 
     # Handling POST requests
     def do_POST(self):
@@ -72,7 +103,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_response(200, "hit={}&sink={}".format(1,'S'))
         elif(result == "sank D"):
             self.send_response(200, "hit={}&sink={}".format(1,'D'))
+        elif(result == "bad-req"):
+            self.send_response(400)
         self.end_headers()
+        printBoard()
         # Create BytesIO object
         response = BytesIO()
         # Print out that this is a POST request 
@@ -86,6 +120,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 # Init server on ip for localc computer on TCP port open to firewall
 httpd = HTTPServer(('192.168.0.197', int(sys.argv[1])), SimpleHTTPRequestHandler)
 gameboard = makeBoard(sys.argv[2])
-print(gameboard)
+printBoard()
 # Server do server things forever
 httpd.serve_forever()
