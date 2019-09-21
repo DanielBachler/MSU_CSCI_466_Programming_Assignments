@@ -31,8 +31,8 @@ def read(x,y, status):
 #uses the arguments to create the required variables
 localServerAddress = sys.argv[1]
 localServerPort = sys.argv[2]
-x = sys.argv[3]
-y = sys.argv[4]
+y = sys.argv[3]
+x = sys.argv[4]
 
 #The server we are connected to
 connection = http.client.HTTPConnection(localServerAddress, localServerPort, timeout=10)
@@ -44,12 +44,16 @@ file = "board.csv"
 if(response.status == 404):
     print("Shot was out of bounds, try again.")
 elif(response.status == 410):
-    print("Something went wrong with the opponents board")
+    print("Shot at previously shot coords")
 elif(response.status == 400):
     print("enter (x,y) coordinates as numbers... No funny A3 shenanagins")
 elif("hit=1&sink=" in response.reason):
     print("Hit and sink" , response.reason[-1])
 elif("hit=" in response.reason):
+    if("hit=1" in response.reason):
+        print("Hit")
+    else:
+        print("Miss")
     read(x,y,response.reason[4])
 else:
     print(response.status, response.reason)
