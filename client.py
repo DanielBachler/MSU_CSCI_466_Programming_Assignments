@@ -49,6 +49,7 @@ elif(response.status == 400):
     print("enter (x,y) coordinates as numbers... No funny A3 shenanagins")
 elif("hit=1&sink=" in response.reason):
     print("Hit and sink" , response.reason[-1])
+    read(x,y,response.reason[4])
 elif("hit=" in response.reason):
     if("hit=1" in response.reason):
         print("Hit")
