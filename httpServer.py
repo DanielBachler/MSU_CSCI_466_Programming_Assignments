@@ -1,3 +1,4 @@
+#Dan and Logan, HTTP Server to run Battleship from
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 import socketserver
@@ -118,7 +119,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(response.getvalue())
 
 # Init server on ip for localc computer on TCP port open to firewall
-httpd = HTTPServer(('192.168.0.197', int(sys.argv[1])), SimpleHTTPRequestHandler)
+httpd = HTTPServer(('100.64.11.151', int(sys.argv[1])), SimpleHTTPRequestHandler)
 gameboard = makeBoard(sys.argv[2])
 printBoard()
 # Server do server things forever
