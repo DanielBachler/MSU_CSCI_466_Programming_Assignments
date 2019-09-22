@@ -7,3 +7,4 @@ bin/python3.6
 lib/python*
 *.txt
 *.csv
+.vscode/settings.json

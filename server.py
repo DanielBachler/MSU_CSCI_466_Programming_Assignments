@@ -151,6 +151,6 @@ httpd = HTTPServer(('192.168.0.197', int(sys.argv[1])), SimpleHTTPRequestHandler
 # Creates the board from the Sys ARG file
 gameboard = makeBoard(sys.argv[2])
 # Prints the inital board
-# printBoard()
+printBoard()
 # Server runs until ctrl+C is pressed in terminal
 httpd.serve_forever()
