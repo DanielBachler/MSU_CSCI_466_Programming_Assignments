@@ -114,7 +114,7 @@ class RDT:
                 #Check for repeated data
                 if testingPacket.seq_num < self.seq_num:
                     print("Repeated Data")
-                    t = Packet(response_p.seq_num, "1")
+                    t = Packet(response.seq_num, "1")
                     self.network.udt_send(t.get_byte_S())
                 #To keep looping until packet is NAK response
                 elif testingPacket.msg_S is "1":
@@ -182,7 +182,7 @@ class RDT:
                     #Updates Sequence Number
                     self.seq_num += 1
                 #Fill in message
-                if recieveSeg == None:
+                if recieveMes == None:
                     recieveMes = packet.msg_S
                 else:
                     recieveMes = recieveMes + packet.msg_S
@@ -207,16 +207,16 @@ if __name__ == '__main__':
     
     rdt = RDT(args.role, args.server, args.port)
     if args.role == 'client':
-        rdt.rdt_1_0_send('MSG_FROM_CLIENT')
+        rdt.rdt_2_1_send('MSG_FROM_CLIENT')
         sleep(2)
-        print(rdt.rdt_1_0_receive())
+        print(rdt.rdt_2_1_receive())
         rdt.disconnect()
         
         
     else:
         sleep(1)
-        print(rdt.rdt_1_0_receive())
-        rdt.rdt_1_0_send('MSG_FROM_SERVER')
+        print(rdt.rdt_2_1_receive())
+        rdt.rdt_2_1_send('MSG_FROM_SERVER')
         rdt.disconnect()
         
 
