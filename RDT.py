@@ -131,28 +131,33 @@ class RDT:
     def rdt_2_1_receive(self):
         recieveMes = None
         byteSeq = self.network.udt_receive()
-        print(str(byteSeq))
         print("byteSeq")
+        print(str(byteSeq))
         self.byte_buffer += byteSeq
-        print(self.byte_buffer)
         print("byte Buffer")
+        print(self.byte_buffer)
         currentSeq = self.seq_num
+        print("Sequence Number")
         print(currentSeq)
-        print("Sequence Number \n")
+        print("\n")
         while currentSeq == self.seq_num:
-            print(Packet.length_S_length)
             print("Packet Length")
+            print(Packet.length_S_length)
+            print("Buffer Type")
+            print(type(self.byte_buffer))
+            print("Buffer Length")
             print(len(self.byte_buffer))
-            print("Buffer Length\n")
+            print("Buffer")
+            print(self.byte_buffer)
             #Check if enough bytes have been sent
-            if len(self.byte_buffer) < Packet.length_S_length:
+            if len(self.byte_buffer) < 10:
                 break
             #Byte length of message
             lengthB = int(self.byte_buffer[:Packet.length_S_length])
-            print(lengthB)
             print("Byte Length")
-            print(len(self.byte_buffer))
+            print(lengthB)
             print("Byte Buffer Length \n")
+            print(len(self.byte_buffer))
             #Check to ensure bytes are of correct length
             if len(self.byte_buffer) < lengthB:
                 break
