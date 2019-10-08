@@ -145,7 +145,7 @@ class RDT:
             print(len(self.byte_buffer))
             print("Buffer Length\n")
             #Check if enough bytes have been sent
-            if len(self.byte_buffer) < Packet.length_S_length:
+            if len(self.byte_buffer) < 10:
                 break
             #Byte length of message
             lengthB = int(self.byte_buffer[:Packet.length_S_length])
