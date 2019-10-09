@@ -2,6 +2,7 @@ import Network
 import argparse
 from time import sleep
 import hashlib
+import sys
 
 
 class Packet:
@@ -99,11 +100,18 @@ class RDT:
         while seq == self.seq_num:
             print("Packet")
             print(packet.get_byte_S())
-            self.network.udt_send(packet.get_byte_S())
+            if not (packet.get_byte_S() == "" and packet.get_byte_S() == None):
+                self.network.udt_send(packet.get_byte_S())
+            else:
+                print("Packet has no value")
+                sys.exit()  
             response = ''
             #Wait for response
-            while response == '':
+            loopCounter = 0
+            while response == '' or response == None:
                 response = self.network.udt_receive()
+                print(loopCounter)
+                loopCounter += 1
             print(response)
             #Recieved length of message message
             message = int(response[:Packet.length_S_length])
@@ -129,8 +137,11 @@ class RDT:
                 self.byte_buffer = ''
         
     def rdt_2_1_receive(self):
+        print("---------------------------------------------")
         recieveMes = None
+        print("Receiving message")
         byteSeq = self.network.udt_receive()
+        print("Received message")
         print("byteSeq")
         print(str(byteSeq))
         self.byte_buffer += byteSeq
@@ -143,12 +154,9 @@ class RDT:
         while currentSeq == self.seq_num:
             print("Packet Length")
             print(Packet.length_S_length)
-            print("Buffer Type")
-            print(type(self.byte_buffer))
-            print("Buffer Length")
-            print(len(self.byte_buffer))
             print("Buffer")
             print(self.byte_buffer)
+            print("---------------------------------------------")
             #Check if enough bytes have been sent
             if len(self.byte_buffer) < 10:
                 break
@@ -156,11 +164,12 @@ class RDT:
             lengthB = int(self.byte_buffer[:Packet.length_S_length])
             print("Byte Length")
             print(lengthB)
-            print("Byte Buffer Length \n")
+            print("Byte Buffer Length")
             print(len(self.byte_buffer))
             #Check to ensure bytes are of correct length
             if len(self.byte_buffer) < lengthB:
                 break
+            print("Length checks out")
             #Check to see if input packet is corrupt
             if Packet.corrupt(self.byte_buffer):
                 print("Packet is corrupt: Sending NAK Message")
@@ -172,6 +181,7 @@ class RDT:
                 #Check if an ACK message
                 if packet.msg_S == '1' or '0':
                     #Skip this segment
+                    print("Skipping interation")
                     self.byte_buffer = self.byte_buffer[lengthB:]
                     continue
                 #Check for if the message contains duplications, if so, send the correction and try again
@@ -188,8 +198,10 @@ class RDT:
                     self.seq_num += 1
                 #Fill in message
                 if recieveMes == None:
+                    print("New start")
                     recieveMes = packet.msg_S
                 else:
+                    print("Continuing message")
                     recieveMes = recieveMes + packet.msg_S
             #drop checked packet bytes
             self.byte_buffer = self.byte_buffer[lengthB:]
