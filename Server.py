@@ -44,7 +44,7 @@ if __name__ == '__main__':
                 continue
         time_of_last_data = time.time()
         
-        #convert and reply
+        # convert and reply
         rep_msg_S = piglatinize(msg_S)
         print('Converted %s \nto \n%s\n' % (msg_S, rep_msg_S))
         rdt.rdt_2_1_send(rep_msg_S)
