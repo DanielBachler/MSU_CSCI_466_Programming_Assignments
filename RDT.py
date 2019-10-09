@@ -146,11 +146,11 @@ class RDT:
         self.byte_buffer += byteSeq
         print("byte Buffer")
         print(self.byte_buffer)
-        currentSeq = self.seq_num
+        currentSeqNum = self.seq_num
         print("Sequence Number")
-        print(currentSeq)
+        print(currentSeqNum)
         print("\n")
-        while currentSeq == self.seq_num:
+        while currentSeqNum == self.seq_num:
             print("Packet Length")
             print(Packet.length_S_length)
             print("Buffer")
