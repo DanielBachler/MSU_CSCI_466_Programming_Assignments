@@ -95,7 +95,6 @@ class RDT:
         #Create Packet and sequence number
         packet = Packet(self.seq_num, msg_S)
         seq = self.seq_num
-        count = 0
         #check to make sure sequence is not corrupted while sending message
         while seq == self.seq_num:
             print("Packet")
@@ -173,7 +172,7 @@ class RDT:
             #Check to see if input packet is corrupt
             if Packet.corrupt(self.byte_buffer):
                 print("Packet is corrupt: Sending NAK Message")
-                self.network.udt_send(Packet(self.seq_num, "0").get_byte_S)
+                self.network.udt_send(Packet(self.seq_num, "0").get_byte_S())
             #Packet is valid, processing
             else:
                 #process buffer segment
