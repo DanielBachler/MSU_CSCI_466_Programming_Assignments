@@ -179,7 +179,7 @@ class RDT:
                 #process buffer segment
                 packet = Packet.from_byte_S(self.byte_buffer[0:lengthB])
                 #Check if an ACK message
-                if packet.msg_S == '1' or '0':
+                if packet.msg_S == '1' or packet.msg_S == '0':
                     #Skip this segment
                     print("Skipping interation")
                     self.byte_buffer = self.byte_buffer[lengthB:]
@@ -188,12 +188,12 @@ class RDT:
                 elif packet.seq_num < self.seq_num:
                     print("Duplicate ACK message, resend")
                     #Sends ACK
-                    self.network.udt_send(Packet(self.seq_num, "1").get_byte_S)
+                    self.network.udt_send(Packet(self.seq_num, "1").get_byte_S())
                 #Found a valid message to process
                 elif packet.seq_num == self.seq_num:
                     print("Valid new message, accept")
                     #Sends ACK
-                    self.network.udt_send(Packet(self.seq_num, "1").get_byte_S)
+                    self.network.udt_send(Packet(self.seq_num, "1").get_byte_S())
                     #Updates Sequence Number
                     self.seq_num += 1
                 #Fill in message
