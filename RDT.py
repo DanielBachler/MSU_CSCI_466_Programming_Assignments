@@ -163,9 +163,8 @@ class RDT:
             #Check if enough bytes have been sent
             if len(self.byte_buffer) < 10:
                 break
-            #Byte length of message
-            receivedP = Packet.from_byte_S(byteSeq)
-            lengthB = int(len(receivedP.msg_S))
+            #Byte length of packet
+            lengthB = int(len(self.byte_buffer[:Packet.length_S_length]))
             print("Message length")
             print(lengthB)
             print("Byte Buffer Length")
@@ -181,15 +180,15 @@ class RDT:
             #Packet is valid, processing
             else:
                 #process buffer segment
-                packet = Packet.from_byte_S(self.byte_buffer[0:lengthB])
+                packet = Packet.from_byte_S(byteSeq)
                 #Check if an ACK message
-                if packet.msg_S == '1' or packet.msg_S == '0':
+                if packet.msg_S == '1':
                     #Skip this segment
                     print("Skipping interation")
                     self.byte_buffer = self.byte_buffer[lengthB:]
                     continue
                 #Check for if the message contains duplications, if so, send the correction and try again
-                elif packet.seq_num < self.seq_num:
+                elif packet.seq_num != self.seq_num:
                     print("Duplicate ACK message, resend")
                     #Sends ACK
                     self.network.udt_send(Packet(self.seq_num, "1").get_byte_S())
@@ -199,7 +198,10 @@ class RDT:
                     #Sends ACK
                     self.network.udt_send(Packet(self.seq_num, "1").get_byte_S())
                     #Updates Sequence Number
-                    self.seq_num += 1
+                    if self.seq_num == 0:
+                        self.seq_num = 1
+                    else:
+                        self.seq_num = 0
                 #Fill in message
                 if recieveMes == None:
                     print("New start")
