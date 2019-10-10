@@ -83,13 +83,13 @@ class NetworkLayer:
         # print("sent Message")
         # print(len(msg_S))
         while totalsent < len(msg_S):
-            print("total sent")
-            print(msg_S[totalsent:])
+            # print("total sent")
+            # print(msg_S[totalsent:])
             sent = self.conn.send(msg_S[totalsent:].encode('utf-8'))
             if sent == 0:
                 raise RuntimeError("socket connection broken")
             totalsent = totalsent + sent
-            print(totalsent)
+            # print(totalsent)
             
             
     ## Receive data from the network and save in internal buffer
