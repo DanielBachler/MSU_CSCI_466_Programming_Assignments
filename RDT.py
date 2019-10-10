@@ -98,12 +98,11 @@ class RDT:
         #check to make sure sequence is not corrupted while sending message
         while seq == self.seq_num:
             print("Packet")
-            print(packet.get_byte_S())
+            print(packet.msg_S)
             if not (packet.get_byte_S() == "" and packet.get_byte_S() == None):
                 self.network.udt_send(packet.get_byte_S())
             else:
                 print("Packet has no value")
-                sys.exit()  
             response = ''
             #Wait for response
             loopCounter = 0
@@ -112,23 +111,26 @@ class RDT:
                 print(loopCounter)
                 loopCounter += 1
             print(response)
+            # Turn response into packet for easily manipulation
+            responseP = Packet.from_byte_S(response)
             #Recieved length of message message
-            message = int(response[:Packet.length_S_length])
+            message = int(len(responseP.msg_S))
+            print("Message:")
+            print(responseP.msg_S)
             #Using byte buffer stream to get message
-            self.byte_buffer = response[message:]
-            if not Packet.corrupt(self.byte_buffer):
-                testingPacket = Packet.from_byte_S(response[:message])
+            self.byte_buffer = responseP.msg_S
+            if not Packet.corrupt(response):
                 #Check for repeated data
-                if testingPacket.seq_num < self.seq_num:
+                if responseP.seq_num < self.seq_num:
                     print("Repeated Data")
                     t = Packet(response.seq_num, "1")
                     self.network.udt_send(t.get_byte_S())
                 #To keep looping until packet is NAK response
-                elif testingPacket.msg_S is "1":
+                elif responseP.msg_S is "1":
                     print("Recieved ACK")
                     self.seq_num += 1
                 #When the response packet is NAK response
-                elif testingPacket.msg_S is "0":
+                elif responseP.msg_S is "0":
                     print("RDT 2.1 NAK received")
                     self.byte_buffer = ''
             else:
@@ -170,7 +172,7 @@ class RDT:
                 break
             print("Length checks out")
             #Check to see if input packet is corrupt
-            if Packet.corrupt(self.byte_buffer):
+            if Packet.corrupt(byteSeq):
                 print("Packet is corrupt: Sending NAK Message")
                 self.network.udt_send(Packet(self.seq_num, "0").get_byte_S())
             #Packet is valid, processing
