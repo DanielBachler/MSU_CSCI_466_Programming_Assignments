@@ -57,8 +57,8 @@ class NetworkLayer:
 
         
     def udt_send(self, msg_S):
-        print(msg_S)
-        print("Sent Message")
+        # print(msg_S)
+        # print("Sent Message")
         #return without sending if the packet is being dropped
         if random.random() < self.prob_pkt_loss:
             return
@@ -80,8 +80,8 @@ class NetworkLayer:
                 
         #keep calling send until all the bytes are transferred
         totalsent = 0
-        print("sent Message")
-        print(len(msg_S))
+        # print("sent Message")
+        # print(len(msg_S))
         while totalsent < len(msg_S):
             print("total sent")
             print(msg_S[totalsent:])
@@ -111,8 +111,8 @@ class NetworkLayer:
            
     ## Deliver collected data to client 
     def udt_receive(self):
-        print("Network Buffer")
-        print(self.buffer_S)
+        # print("Network Buffer")
+        # print(self.buffer_S)
         with self.lock:
             ret_S = self.buffer_S
             self.buffer_S = ''
