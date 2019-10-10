@@ -97,8 +97,7 @@ class RDT:
         seq = self.seq_num
         #check to make sure sequence is not corrupted while sending message
         while seq == self.seq_num:
-            print("Packet")
-            print(packet.msg_S)
+            print("Packet: " + packet.msg_S)
             if not (packet.get_byte_S() == "" and packet.get_byte_S() == None):
                 self.network.udt_send(packet.get_byte_S())
             else:
@@ -112,11 +111,13 @@ class RDT:
                 loopCounter += 1
             print(response)
             # Turn response into packet for easily manipulation
-            responseP = Packet.from_byte_S(response)
+            try:
+                responseP = Packet.from_byte_S(response)
+            except:
+                print(responseP)
+                raise RuntimeError('Packet is corrupted APPARENTLY')
             #Recieved length of message message
-            message = int(len(responseP.msg_S))
-            print("Message:")
-            print(responseP.msg_S)
+            print("Message: " + responseP.msg_S)
             #Using byte buffer stream to get message
             self.byte_buffer = responseP.msg_S
             if not Packet.corrupt(response):
@@ -144,31 +145,24 @@ class RDT:
     def rdt_2_1_receive(self):
         print("---------------------------------------------")
         recieveMes = None
-        print("Receiving message")
         byteSeq = self.network.udt_receive()
         print("Received message")
-        print("byteSeq")
-        print(str(byteSeq))
+        print("byteSeq: " str(byteSeq))
         self.byte_buffer += byteSeq
         currentSeqNum = self.seq_num
-        print("Sequence Number")
-        print(currentSeqNum)
+        print("Sequence Number: " + currentSeqNum)
         print("\n")
         while currentSeqNum == self.seq_num:
-            print("Packet Length")
-            print(Packet.length_S_length)
-            print("Buffer")
-            print(self.byte_buffer)
+            print("Packet Length: " + Packet.length_S_length)
+            print("Buffer: " + self.byte_buffer)
             print("---------------------------------------------")
             #Check if enough bytes have been sent
             if len(self.byte_buffer) < 10:
                 break
             #Byte length of packet
             lengthB = int(len(self.byte_buffer[:Packet.length_S_length]))
-            print("Message length")
-            print(lengthB)
-            print("Byte Buffer Length")
-            print(len(self.byte_buffer))
+            print("Message length: " + lengthB)
+            print("Byte Buffer Length: " + len(self.byte_buffer))
             #Check to ensure bytes are of correct length
             if len(self.byte_buffer) < lengthB:
                 break
