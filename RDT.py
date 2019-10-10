@@ -108,7 +108,11 @@ class RDT:
                 response = self.network.udt_receive()
             # print(response)
             # Turn response into packet for easily manipulation
-            responseP = Packet.from_byte_S(response)
+            try:
+                responseP = Packet.from_byte_S(response)
+            except:
+                print(response)
+                sys.exit()
             #Recieved length of message message
             print("Message: " + responseP.msg_S)
             #Using byte buffer stream to get message
@@ -143,10 +147,10 @@ class RDT:
         print("byteSeq: " + str(byteSeq))
         self.byte_buffer += byteSeq
         currentSeqNum = self.seq_num
-        print("Sequence Number: " + currentSeqNum)
+        print("Sequence Number: " + str(currentSeqNum))
         print("\n")
         while currentSeqNum == self.seq_num:
-            print("Packet Length: " + Packet.length_S_length)
+            print("Packet Length: " + str(Packet.length_S_length))
             print("Buffer: " + self.byte_buffer)
             print("---------------------------------------------")
             #Check if enough bytes have been sent
@@ -154,8 +158,8 @@ class RDT:
                 break
             #Byte length of packet
             lengthB = int(len(self.byte_buffer[:Packet.length_S_length]))
-            print("Message length: " + lengthB)
-            print("Byte Buffer Length: " + len(self.byte_buffer))
+            print("Message length: " + str(lengthB))
+            print("Byte Buffer Length: " + str(len(self.byte_buffer)))
             #Check to ensure bytes are of correct length
             if len(self.byte_buffer) < lengthB:
                 break
@@ -199,6 +203,7 @@ class RDT:
             #drop checked packet bytes
             self.byte_buffer = self.byte_buffer[lengthB:]
         #returning Packet
+        self.byte_buffer = ""
         return recieveMes
         
     def rdt_3_0_send(self, msg_S):
