@@ -108,11 +108,7 @@ class RDT:
                 response = self.network.udt_receive()
             # print(response)
             # Turn response into packet for easily manipulation
-            try:
-                responseP = Packet.from_byte_S(response)
-            except:
-                print(responseP)
-                raise RuntimeError('Packet is corrupted APPARENTLY')
+            responseP = Packet.from_byte_S(response)
             #Recieved length of message message
             print("Message: " + responseP.msg_S)
             #Using byte buffer stream to get message
@@ -144,7 +140,7 @@ class RDT:
         recieveMes = None
         byteSeq = self.network.udt_receive()
         print("Received message")
-        print("byteSeq: " str(byteSeq))
+        print("byteSeq: " + str(byteSeq))
         self.byte_buffer += byteSeq
         currentSeqNum = self.seq_num
         print("Sequence Number: " + currentSeqNum)
