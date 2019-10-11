@@ -95,33 +95,45 @@ class RDT:
         #Create Packet and sequence number
         packet = Packet(self.seq_num, msg_S)
         seq = self.seq_num
+        buffer = " "
         #check to make sure sequence is not corrupted while sending message
-        while seq == self.seq_num:
-            print("Packet: " + packet.msg_S)
+        while seq == self.seq_num or buffer is not "":
+            # print("Packet: " + packet.msg_S)
             if not (packet.get_byte_S() == "" and packet.get_byte_S() == None):
                 self.network.udt_send(packet.get_byte_S())
             else:
                 print("Packet has no value")
-            response = ''
             #Wait for response
+            response = ''
             while response == '' or response == None:
                 response = self.network.udt_receive()
+            oldResp = response
+            if(buffer == " "):
+                buffer = response
+            elif response is not oldResp:
+                buffer += response
+            response = ''
             # print(response)
             # Turn response into packet for easily manipulation
             try:
-                responseP = Packet.from_byte_S(response)
+                firstPacketLength = int(buffer[:Packet.length_S_length])
+                responseP = Packet.from_byte_S(buffer[:firstPacketLength])
+                buffer = buffer[firstPacketLength:]
+                print("Message " + responseP.msg_S)
+                print("Packet " + responseP.get_byte_S())
+                print("Buffer " + buffer + "\n")
             except:
                 print(response)
                 sys.exit()
             #Recieved length of message message
-            print("Message: " + responseP.msg_S)
+            # print("Message: " + responseP.msg_S)
             #Using byte buffer stream to get message
             self.byte_buffer = responseP.msg_S
-            if not Packet.corrupt(response):
+            if not Packet.corrupt(responseP.get_byte_S()):
                 #Check for repeated data
                 if responseP.seq_num != self.seq_num:
                     print("Repeated Data")
-                    t = Packet(response.seq_num, "1")
+                    t = Packet(responseP.seq_num, "1")
                     self.network.udt_send(t.get_byte_S())
                 #To keep looping until packet is NAK response
                 elif responseP.msg_S is "1":
@@ -143,35 +155,36 @@ class RDT:
         # print("---------------------------------------------")
         recieveMes = None
         byteSeq = self.network.udt_receive()
-        print("Received message")
-        print("byteSeq: " + str(byteSeq))
+        # print("Received message")
+        # print("byteSeq: " + str(byteSeq))
         self.byte_buffer += byteSeq
         currentSeqNum = self.seq_num
-        print("Sequence Number: " + str(currentSeqNum))
-        print("\n")
+        # print("Sequence Number: " + str(currentSeqNum))
+        # print("\n")
         while currentSeqNum == self.seq_num:
-            print("Packet Length: " + str(Packet.length_S_length))
-            print("Buffer: " + self.byte_buffer)
-            print("---------------------------------------------")
+            # print("Packet Length: " + str(Packet.length_S_length))
+            # print("Buffer: " + self.byte_buffer)
+            # print("---------------------------------------------")
             #Check if enough bytes have been sent
             if len(self.byte_buffer) < 10:
                 break
             #Byte length of packet
             lengthB = int(len(self.byte_buffer[:Packet.length_S_length]))
-            print("Message length: " + str(lengthB))
-            print("Byte Buffer Length: " + str(len(self.byte_buffer)))
+            # print("Message length: " + str(lengthB))
+            # print("Byte Buffer Length: " + str(len(self.byte_buffer)))
             #Check to ensure bytes are of correct length
             if len(self.byte_buffer) < lengthB:
                 break
             #print("Length checks out")
             #Check to see if input packet is corrupt
-            if Packet.corrupt(byteSeq):
+            if Packet.corrupt(self.byte_buffer[:lengthB]):
                 print("Packet is corrupt: Sending NAK Message")
                 self.network.udt_send(Packet(self.seq_num, "0").get_byte_S())
+                self.byte_buffer = self.byte_buffer[lengthB:]
             #Packet is valid, processing
             else:
                 #process buffer segment
-                packet = Packet.from_byte_S(byteSeq)
+                packet = Packet.from_byte_S(self.byte_buffer[:int(self.byte_buffer[:Packet.length_S_length])])
                 #Check if an ACK message
                 if packet.msg_S == '1':
                     #Skip this segment
