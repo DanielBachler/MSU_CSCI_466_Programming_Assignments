@@ -95,9 +95,8 @@ class RDT:
         #Create Packet and sequence number
         packet = Packet(self.seq_num, msg_S)
         seq = self.seq_num
-        buffer = " "
         #check to make sure sequence is not corrupted while sending message
-        while seq == self.seq_num or buffer is not "":
+        while seq == self.seq_num:
             # print("Packet: " + packet.msg_S)
             if not (packet.get_byte_S() == "" and packet.get_byte_S() == None):
                 self.network.udt_send(packet.get_byte_S())
@@ -107,28 +106,22 @@ class RDT:
             response = ''
             while response == '' or response == None:
                 response = self.network.udt_receive()
-            oldResp = response
-            if(buffer == " "):
-                buffer = response
-            elif response is not oldResp:
-                buffer += response
-            response = ''
+            self.byte_buffer += response
             # print(response)
             # Turn response into packet for easily manipulation
             try:
-                firstPacketLength = int(buffer[:Packet.length_S_length])
-                responseP = Packet.from_byte_S(buffer[:firstPacketLength])
-                buffer = buffer[firstPacketLength:]
+                firstPacketLength = int(self.byte_buffer[:Packet.length_S_length])
+                responseP = Packet.from_byte_S(self.byte_buffer[:firstPacketLength])
+                self.byte_buffer = self.byte_buffer[firstPacketLength:]
                 print("Message " + responseP.msg_S)
                 print("Packet " + responseP.get_byte_S())
-                print("Buffer " + buffer + "\n")
+                print("Buffer " + self.byte_buffer + "\n")
             except:
                 print(response)
                 sys.exit()
             #Recieved length of message message
             # print("Message: " + responseP.msg_S)
             #Using byte buffer stream to get message
-            self.byte_buffer = responseP.msg_S
             if not Packet.corrupt(responseP.get_byte_S()):
                 #Check for repeated data
                 if responseP.seq_num != self.seq_num:
@@ -146,10 +139,10 @@ class RDT:
                 #When the response packet is NAK response
                 elif responseP.msg_S is "0":
                     print("RDT 2.1 NAK received")
-                    self.byte_buffer = ''
+                    self.byte_buffer = ""
             else:
                 print("RDT 2.1 Corrupted ACK")
-                self.byte_buffer = ''
+                self.byte_buffer = ""
         
     def rdt_2_1_receive(self):
         # print("---------------------------------------------")

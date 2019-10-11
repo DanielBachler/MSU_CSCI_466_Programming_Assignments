@@ -37,5 +37,5 @@ if __name__ == '__main__':
         #print the result
         if msg_S:
             print('to: '+msg_S+'\n')
-        
+            
     rdt.disconnect()
